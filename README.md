@@ -31,7 +31,7 @@ The Pose Model analyzes the crop to find the 4 corners of the license plate.
 
 ### Step 4: Perspective Warping & Processing
 Using the keypoints, the plate is warped into a flat rectangle and sharpened.
-![Step 4 - Plate](plate.jpg)
+![Step 4 - Plate](test-photos/plate.jpg)
 
 ### Step 5: OCR & Result
 **PaddleOCR** reads the text, applies error correction, and logs the result.
