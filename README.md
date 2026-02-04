@@ -65,7 +65,12 @@ The custom **YOLO-Pose** model was trained to achieve high precision in license 
 └── 📁 pose_results/keypoints_model/
     └── best-2.pt                     # Custom License Plate Pose Model
 ```
+## 🛠️ Quick Start
 
+1. **Clone the repo:** `git clone https://github.com/Nislive/license_plate_recognition.git`
+2. **Install requirements:** `pip install -r requirements.txt`
+3. **Run the system:** `python main.py`
+   
 ## ⚖️ License
 
 This project is licensed under the **MIT License**.
