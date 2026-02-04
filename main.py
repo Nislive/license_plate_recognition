@@ -2,7 +2,6 @@ from ultralytics import YOLO
 import sqlite3
 import numpy as np
 import cv2
-from paddleocr import PaddleOCR
 import threading
 from queue import Queue
 from paddleocr import TextRecognition
@@ -114,14 +113,15 @@ def ocr_worker(pose_model, ocr_instance):
                     for res in ocr_results:
                         if res is None:
                             continue
-                        text_raw, score = res["rec_text"],res["rec_score"]                         
+                        text_raw, score = res["rec_text"],res["rec_score"] 
+                        rounded_score = round(score, 2)                        
                         if score>0.60:                        
                             plate_text = fix_plate_text_errors(text_raw)
                             if plate_text is not None:
                                 try:
                                     print(vehicle_type)
                                     print(plate_text)
-                                    db_cur.execute("INSERT INTO detections (vehicle_type, plate_text, plate_confidence) VALUES (?,?,?)", (vehicle_type, plate_text, score))
+                                    db_cur.execute("INSERT INTO detections (vehicle_type, plate_text, plate_confidence) VALUES (?,?,?)", (vehicle_type, plate_text, rounded_score))
                                     db_con.commit()
                                 except Exception as e:
                                     print(e)
