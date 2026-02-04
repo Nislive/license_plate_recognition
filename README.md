@@ -52,8 +52,6 @@ The custom **YOLO-Pose** model was trained to achieve high precision in license 
 
 ## 📂 Project Structure
 
-Ensure you have the following file structure and models:
-
 ```text
 📁 Traffic-ALPR/
 │
