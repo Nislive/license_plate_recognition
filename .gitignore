@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+.DS_Store
+.AppleDouble
+.LSOverride
+traffic_data.db
+test_videos/
+yolo26n.pt
