@@ -6,3 +6,4 @@ __pycache__/
 traffic_data.db
 test_videos/
 yolo26n.pt
+yolo26n-pose.pt
