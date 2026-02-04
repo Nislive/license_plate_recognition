@@ -128,6 +128,66 @@ def ocr_worker(pose_model, ocr_instance):
         ocr_queue.task_done()
     db_con.close()
 
+init_db()
+
+model = YOLO('yolo26n.pt')
+model2 = YOLO('pose_results/keypoints_model/best-2.pt')
+
 
 text_model = TextRecognition(model_name="PP-OCRv5_server_rec")
 ocr_queue = Queue()
+
+tracked_ids = set()
+
+worker_thread = threading.Thread(target=ocr_worker, args=(model2, text_model), daemon=True)
+worker_thread.start()
+
+#2:car, 3:motorcycle, 5:bus, 7:truck
+results = model.track(source="test_videos/video-1.mp4", 
+                      classes=[2,3,5,7], 
+                      persist=True, 
+                      tracker="bytetrack.yaml", 
+                      stream=True, 
+                      show=False,
+                      conf=0.6)
+
+for result in results:
+
+    total_h, total_w = result.orig_shape 
+    total_area = total_h * total_w
+    frame = result.orig_img
+
+    line = total_h*0.540
+
+    if result.boxes.id is not None:
+        track_ids = result.boxes.id.int().tolist()
+        
+        for box, track_id in zip(result.boxes, track_ids):
+            
+
+            cor = box.xyxy[0]
+
+            x1,y1,x2,y2 = cor.int().tolist()
+
+            margin = 40
+            is_clipping = (x1 < margin or y1 < margin or x2 > (total_w - margin) or y2 > (total_h - margin))
+            
+            w = x2-x1
+            h = y2-y1
+            
+            vehicle_crop = frame[y1:y2, x1:x2]
+
+            y2=cor[3].item()
+            y_center = box.xywh[0][1].item()
+
+            item_area = w * h
+            percentage = (item_area / total_area) * 100
+
+            if percentage > 0.50 and y2>line and not is_clipping and track_id not in tracked_ids:
+                if vehicle_crop.size>0:
+                    tracked_ids.add(track_id)
+                    cls_id = int(box.cls[0])
+                    vehicle_type =  model.names[cls_id]
+                    ocr_queue.put((vehicle_crop.copy(), track_id, vehicle_type))
+ocr_queue.join()
+ocr_queue.put(None)
